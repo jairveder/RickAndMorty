@@ -12,17 +12,17 @@ Rick and Morty is a solution for loading the characters and exposing them throug
 Update-Database
 ```
 
-## Usage of RickAndMorty.ConsoleApp
+## Usage of ConsoleApp
 
 1. Update the default connectionString in appsettings.json to the MySql database. 
 2. Set RickAndMorty.ConsoleApp as the startup project.
 3. Run the project.
 
-## Usage of RickAndMorty.WebApi
+## Usage of WebApi
 
 1. Update the default connectionString in appsettings.json to the MySql database. 
 2. Set RickAndMorty.WebApi as the startup project.
 3. Run the project.
 
-## Usage of RickAndMorty.UnitTests
+## Usage of UnitTests
 1. Run the project.
