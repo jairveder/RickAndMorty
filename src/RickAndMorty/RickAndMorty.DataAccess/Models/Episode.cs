@@ -5,8 +5,7 @@ namespace RickAndMorty.DataAccess.Models
 {
     public class Episode
     {
-        public int Id { get; set; }
-        [Required]
+        public int EpisodeId { get; set; }
         [MaxLength(200)]
         public string FullName { get; set; }
         public ICollection<CharacterEpisode> CharacterEpisodes { get; set; }

@@ -5,16 +5,18 @@ using Serilog;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using RickAndMorty.ConsoleApp.Converters;
+using RickAndMorty.ConsoleApp.Facades;
+using RickAndMorty.ConsoleApp.Processors;
 
 namespace RickAndMorty.ConsoleApp
 {
     class Program
     {
-        public static IConfigurationRoot configuration;
+        private static IConfigurationRoot? _configuration;
 
-        static int Main(string[] args)
+        static int Main()
         {
-            // Initialize serilog logger
             Log.Logger = new LoggerConfiguration()
                  .WriteTo.Console(Serilog.Events.LogEventLevel.Information)
                  .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
@@ -24,7 +26,7 @@ namespace RickAndMorty.ConsoleApp
 
             try
             {
-                MainAsync(args).Wait();
+                MainAsync().Wait();
                 return 0;
             }
             catch
@@ -33,19 +35,16 @@ namespace RickAndMorty.ConsoleApp
             }
         }
 
-        static async Task MainAsync(string[] args)
+        static async Task MainAsync()
         {
-            // Create service collection
             Log.Information("Creating service collection");
             ServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            // Create service provider
             Log.Information("Building service provider");
             IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // Print connection string to demonstrate configuration object is populated
-            Log.Information(configuration.GetConnectionString("Default"));
+            Log.Information($"ConnectionString is: {_configuration.GetConnectionString("Default")}");
 
             try
             {
@@ -56,8 +55,8 @@ namespace RickAndMorty.ConsoleApp
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Error running service");
-                throw ex;
+                Log.Fatal(ex, $"Error running service {ex.Message}");
+                throw;
             }
             finally
             {
@@ -67,10 +66,8 @@ namespace RickAndMorty.ConsoleApp
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            // Add httpClient
             services.AddHttpClient();
-
-            // Add logging
+            
             services.AddSingleton(LoggerFactory.Create(builder =>
             {
                 builder.AddSerilog(dispose: true);
@@ -78,24 +75,25 @@ namespace RickAndMorty.ConsoleApp
 
             services.AddLogging();
 
-            // Build configuration
-            configuration = new ConfigurationBuilder()
+            _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            // Add access to generic IConfigurationRoot
-            services.AddSingleton(configuration);
+            services.AddSingleton(_configuration);
 
-            // Add services
+            #region converters
             services.AddTransient<ICharacterContextConverter, CharacterContextConverter>();
-            services.AddTransient<IApiProcessor, ApiProcessor>();
+            #endregion
+            #region facades
             services.AddTransient<IRickAndMortyFacade, RickAndMortyFacade>();
+            #endregion
+            #region processors
+            services.AddTransient<IApiProcessor, ApiProcessor>();
             services.AddTransient<IRickAndMortyDataProcessor, RickAndMortyDataProcessor>();
-           
+            #endregion
 
-            // Add module
-            services.AddDataAccessModule(configuration);
+            services.AddDataAccessModule(_configuration);
         }
     }
 }

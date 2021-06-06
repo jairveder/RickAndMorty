@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RickAndMorty.DataAccess;
+using RickAndMorty.DataAccess.Contexts;
 
 namespace RickAndMorty.DataAccess.Migrations
 {
     [DbContext(typeof(CharacterContext))]
-    [Migration("20210603140320_InitialDatabase")]
+    [Migration("20210606070600_InitialDatabase")]
     partial class InitialDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,67 +19,59 @@ namespace RickAndMorty.DataAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.6");
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Character", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Character", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CharacterId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasMaxLength(200)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<int?>("LocationId")
+                    b.Property<int?>("LocationPlanetId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<int?>("OriginId")
+                    b.Property<int?>("OriginPlanetId")
                         .HasColumnType("int");
 
                     b.Property<string>("Species")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("Type")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Url")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
-                    b.HasIndex("LocationId");
+                    b.HasKey("CharacterId");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("LocationPlanetId");
 
-                    b.HasIndex("OriginId");
+                    b.HasIndex("OriginPlanetId");
 
                     b.ToTable("Character");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.CharacterEpisode", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.CharacterEpisode", b =>
                 {
                     b.Property<int>("CharacterId")
                         .HasColumnType("int");
@@ -94,90 +86,66 @@ namespace RickAndMorty.DataAccess.Migrations
                     b.ToTable("CharacterEpisode");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Episode", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Episode", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("EpisodeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("EpisodeId");
 
                     b.ToTable("Episode");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Location", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Planet", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PlanetId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("Url")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PlanetId");
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Location");
+                    b.ToTable("Planet");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Origin", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Character", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Origin");
-                });
-
-            modelBuilder.Entity("RickAndMorty.DataAccess.Character", b =>
-                {
-                    b.HasOne("RickAndMorty.DataAccess.Location", "Location")
+                    b.HasOne("RickAndMorty.DataAccess.Models.Planet", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationId");
+                        .HasForeignKey("LocationPlanetId");
 
-                    b.HasOne("RickAndMorty.DataAccess.Origin", "Origin")
+                    b.HasOne("RickAndMorty.DataAccess.Models.Planet", "Origin")
                         .WithMany()
-                        .HasForeignKey("OriginId");
+                        .HasForeignKey("OriginPlanetId");
 
                     b.Navigation("Location");
 
                     b.Navigation("Origin");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.CharacterEpisode", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.CharacterEpisode", b =>
                 {
-                    b.HasOne("RickAndMorty.DataAccess.Character", "Character")
+                    b.HasOne("RickAndMorty.DataAccess.Models.Character", "Character")
                         .WithMany("CharacterEpisodes")
                         .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RickAndMorty.DataAccess.Episode", "Episode")
+                    b.HasOne("RickAndMorty.DataAccess.Models.Episode", "Episode")
                         .WithMany("CharacterEpisodes")
                         .HasForeignKey("EpisodeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -188,12 +156,12 @@ namespace RickAndMorty.DataAccess.Migrations
                     b.Navigation("Episode");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Character", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Character", b =>
                 {
                     b.Navigation("CharacterEpisodes");
                 });
 
-            modelBuilder.Entity("RickAndMorty.DataAccess.Episode", b =>
+            modelBuilder.Entity("RickAndMorty.DataAccess.Models.Episode", b =>
                 {
                     b.Navigation("CharacterEpisodes");
                 });

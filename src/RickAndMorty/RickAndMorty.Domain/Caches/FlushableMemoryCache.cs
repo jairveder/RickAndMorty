@@ -8,10 +8,8 @@ namespace RickAndMorty.Domain.Caches
     {
         void Set<T>(string key, T value);
         bool TryGetValue<T>(string key, out T value);
-        void Remove(string key);
         void Flush();
     }
-
 
     public class FlushableMemoryCache : IFlushableMemoryCache
     {
@@ -40,16 +38,6 @@ namespace RickAndMorty.Domain.Caches
         public bool TryGetValue<T>(string key, out T value)
         {
             return _memoryCache.TryGetValue(key, out value);
-        }
-
-        public void Remove(string key)
-        {
-            _memoryCache.Remove(key);
-
-            if (_keys.Contains(key))
-            {
-                _keys.Remove(key);
-            }
         }
 
         public void Flush()

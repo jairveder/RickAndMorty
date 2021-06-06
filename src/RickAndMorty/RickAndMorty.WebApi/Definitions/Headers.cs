@@ -2,6 +2,6 @@
 {
     public static class Headers
     {
-        public static string FromDatabase = "from-database";
+        public const string FromDatabase = "from-database";
     }
 }

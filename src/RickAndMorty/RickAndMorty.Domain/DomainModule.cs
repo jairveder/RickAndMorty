@@ -12,12 +12,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddMemoryCache();
             services.AddDataAccessModule(configuration);
 
+            #region caches
             services.AddSingleton<IFlushableMemoryCache, FlushableMemoryCache>();
-
-            services.AddTransient<IRickAndMortyProcessor, RickAndMortyProcessor>();
-
+            #endregion
+            #region converters
             services.AddTransient<IDataAccessCharacterConverter, DataAccessCharacterConverter>();
-            
+            #endregion
+            #region processors
+            services.AddTransient<IRickAndMortyProcessor, RickAndMortyProcessor>();
+            #endregion
         }
     }
 }

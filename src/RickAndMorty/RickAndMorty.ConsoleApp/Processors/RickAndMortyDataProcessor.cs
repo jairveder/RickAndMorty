@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RickAndMorty.DataAccess;
-using RickAndMorty.DataAccess.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using RickAndMorty.DataAccess.Contexts;
+using RickAndMorty.DataAccess.Models;
 
-namespace RickAndMorty.ConsoleApp
+namespace RickAndMorty.ConsoleApp.Processors
 {
     public interface IRickAndMortyDataProcessor
     {

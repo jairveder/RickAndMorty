@@ -1,16 +1,16 @@
-﻿using RickAndMorty.ConsoleApp.Models;
-using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using RickAndMorty.ConsoleApp.Models;
+using Serilog;
 
-namespace RickAndMorty.ConsoleApp
+namespace RickAndMorty.ConsoleApp.Processors
 {
     public interface IApiProcessor
     {
-        public Task<List<Result>> GetCharactersAsync();
+        public Task<List<Character>> GetCharactersAsync();
     }
 
     public class ApiProcessor : IApiProcessor
@@ -23,11 +23,11 @@ namespace RickAndMorty.ConsoleApp
             _clientFactory = clientFactory;
         }
 
-        public async Task<List<Result>> GetCharactersAsync()
+        public async Task<List<Character>> GetCharactersAsync()
         {
-            var results = new List<Result>();
+            var characters = new List<Character>();
             var nextUrl = RickAndMortyUrl;
-            var httpClient = _clientFactory.CreateClient(); ;
+            var httpClient = _clientFactory.CreateClient();
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -51,13 +51,13 @@ namespace RickAndMorty.ConsoleApp
                             if (result != null)
                             {
                                 // Build the full list to return later after the loop.
-                                if (result.Results.Any())
-                                    results.AddRange(result.Results.ToList());
+                                if (result.Characters != null && result.Characters.Any())
+                                    characters.AddRange(result.Characters.ToList());
 
-                                Log.Information($"Loading completed for page {counter} out of {result.Info.Pages}.");
+                                Log.Information($"Loading completed for page {counter} out of {result.Info?.Pages}.");
             
                                 // Get the URL for the next page
-                                nextUrl = result.Info.Next ?? string.Empty;
+                                nextUrl = result.Info?.Next ?? string.Empty;
 
                                 // increment counter;
                                 counter++;
@@ -75,9 +75,9 @@ namespace RickAndMorty.ConsoleApp
 
             } while (!string.IsNullOrEmpty(nextUrl));
 
-            Log.Information($"\nLoading of rick and morty completed.Total characters {results.Count}");
+            Log.Information($"\nLoading of rick and morty completed.Total characters {characters.Count}");
 
-            return results;
+            return characters;
         }
     }
 }

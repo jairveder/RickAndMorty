@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RickAndMorty.DataAccess.Models;
 
-namespace RickAndMorty.DataAccess
+namespace RickAndMorty.DataAccess.Contexts
 {
     public class CharacterContext : DbContext
     {
-        public static string[] Tables = new string[] { "Character", "Location", "Origin", "Episode", "CharacterEpisode" };
+        public static readonly string[] Tables = { "Character", "Planet", "Episode", "CharacterEpisode" };
         public CharacterContext(DbContextOptions<CharacterContext> options) : base(options) { }
         public DbSet<Character> Character { get; set; }
-        public DbSet<Location> Location { get; set; }
-        public DbSet<Origin> Origin { get; set; }
+        public DbSet<Planet> Planet { get; set; }
         public DbSet<Episode> Episode { get; set; }
         public DbSet<CharacterEpisode> CharacterEpisode { get; set; }
 

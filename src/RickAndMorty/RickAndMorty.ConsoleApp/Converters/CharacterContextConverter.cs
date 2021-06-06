@@ -1,92 +1,69 @@
-﻿using RickAndMorty.ConsoleApp.Models;
-using RickAndMorty.DataAccess.Models;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RickAndMorty.DataAccess.Models;
+using Character = RickAndMorty.ConsoleApp.Models.Character;
 
-namespace RickAndMorty.ConsoleApp
+namespace RickAndMorty.ConsoleApp.Converters
 {
     public interface ICharacterContextConverter
     {
-        public Character Convert(Result result);
+        public DataAccess.Models.Character Convert(Character character);
     }
 
     public class CharacterContextConverter : ICharacterContextConverter
     {
         private readonly List<Episode> _episodes;
-        private readonly List<DataAccess.Models.Location> _locations;
-        private readonly List<DataAccess.Models.Origin> _origins;
+        private readonly List<Planet> _planets;
 
         public CharacterContextConverter()
         {
             _episodes = new List<Episode>();
-            _locations = new List<DataAccess.Models.Location>();
-            _origins = new List<DataAccess.Models.Origin>();
+            _planets = new List<Planet>();
         }
 
-        public Character Convert(Result result)
+        public DataAccess.Models.Character Convert(Character character)
         {
-            if (result == null)
-                return null;
-
-            var character = new Character
+            var dataAccessCharacter = new DataAccess.Models.Character
             {
-                Id = result.Id,
-                Name = result.Name,
-                Status = result.Status,
-                Species = result.Species,
-                Type = result.Type,
-                Gender = result.Gender,
-                Origin = Convert(result.Origin),
-                Location = Convert(result.Location),
-                Image = result.Image,
-                Url = result.Url,
-                Created = result.Created
+                CharacterId = character.Id ?? 0,
+                Name = character.Name,
+                Status = character.Status,
+                Species = character.Species,
+                Type = character.Type,
+                Gender = character.Gender,
+                Origin = character.Origin == null ? null : Convert(character.Origin.Name, character.Origin.Url),
+                Location = character.Location == null ? null : Convert(character.Location.Name, character.Location.Url),
+                Image = character.Image,
+                Url = character.Url,
+                Created = character.Created ?? DateTime.Now
             };
 
-            character.CharacterEpisodes = result.Episode.Select(x => Convert(x, character)).ToList();
+            dataAccessCharacter.CharacterEpisodes = character.Episode?.Select(x => Convert(x, dataAccessCharacter)).ToList();
 
-            return character;
+            return dataAccessCharacter;
         }
 
-        private DataAccess.Models.Origin Convert(Models.Origin origin)
+        private Planet? Convert(string? name, string? url)
         {
-            if (origin == null || origin.Name == "unknown")
+            if (name == "unknown")
                 return null;
 
-            var selectedOrigin = _origins.SingleOrDefault(x => x.Name.Equals(origin.Name) && x.Url.Equals(origin.Url));
-            if (selectedOrigin != null)
-                return selectedOrigin;
+            var selectedPlanet = _planets.SingleOrDefault(x => x.Name.Equals(name) && x.Url.Equals(url));
+            if (selectedPlanet != null)
+                return selectedPlanet;
             
-            selectedOrigin = new DataAccess.Models.Origin
+            selectedPlanet = new Planet
             {
-                Name = origin.Name,
-                Url = origin.Url
+                Name = name,
+                Url = url
             };
-            _origins.Add(selectedOrigin);
+            _planets.Add(selectedPlanet);
 
-            return selectedOrigin;
+            return selectedPlanet;
         }
-
-        private DataAccess.Models.Location Convert(Models.Location location)
-        {
-            if (location == null || location.Name == "unknown")
-                return null;
-
-            var selectedLocation = _locations.SingleOrDefault(x => x.Name.Equals(location.Name) && x.Url.Equals(location.Url));
-            if (selectedLocation != null)
-                return selectedLocation;
-
-            selectedLocation = new DataAccess.Models.Location
-            {
-                Name = location.Name,
-                Url = location.Url
-            };
-            _locations.Add(selectedLocation);
-
-            return selectedLocation;
-        }
-
-        private CharacterEpisode Convert(string episode, Character character)
+        
+        private CharacterEpisode Convert(string episode, DataAccess.Models.Character character)
         {
             var selectedEpisode = _episodes.SingleOrDefault(x => x.FullName.Equals(episode));
             if (selectedEpisode == null)
